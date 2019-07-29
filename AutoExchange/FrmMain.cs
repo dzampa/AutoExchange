@@ -45,6 +45,8 @@ namespace AutoExchange
             bool Valid;
             bool Auto;
 
+            int decPart;
+
             try
             {
 
@@ -169,11 +171,15 @@ namespace AutoExchange
 
                     if (par.AskPrice == 0)
                         continue;
+                    if (Convert.ToDouble(par.Volume).ToString().Contains("."))  
+                        decPart = Convert.ToDouble(par.Volume).ToString().Substring(par.Volume.ToString().IndexOf(".") + 1).Length;
+                    else
+                        decPart = 0;
 
-                    soma1 = Math.Round(startCurrence / par.AskPrice, 8);
+                    soma1 = Math.Round(startCurrence / par.AskPrice, decPart);
                     if (par.askQty <= soma1)
                         Valid = false;
-                    soma1 -= Math.Round(soma1 * fee,8);                    
+                    //soma1 -= Math.Round(soma1 * fee,8);                    
 
                     var pares = bnb.Where(x => x.symbol.StartsWith(m1) && !x.symbol.Contains(par.symbol) && !x.symbol.Contains("USD")).ToList();
 
@@ -181,25 +187,30 @@ namespace AutoExchange
                     {
                         txt = new StringBuilder();
                         txt.AppendLine("==============================================================================");
-                        txt.AppendLine("Exchange: " + par.symbol + " - Buy Price: " + par.AskPrice + m2 + " - Total Coin: " + soma1 + m1);
+                        txt.AppendLine("Exchange: " + par.symbol + " - Buy Price: " + par.AskPrice + m2 + " - Total Coin: " + Math.Round(soma1 * fee, 8) + m1);
 
                         soma2 = 0;
-                        if (par.AskPrice == 0)
+                        if (Convert.ToDouble(parMoeda1.Volume).ToString().Contains("."))
+                            decPart = Convert.ToDouble(parMoeda1.Volume).ToString().Substring(parMoeda1.Volume.ToString().IndexOf(".") + 1).Length;
+                        else
+                            decPart = 0;
+
+                        if (par.BidPrice == 0)
                             continue;
-                        if (parMoeda1.AskPrice > 1)
+                        if (parMoeda1.BidPrice > 1)
                         {
-                            soma2 = Math.Round(soma1 / parMoeda1.AskPrice, 8);
+                            soma2 = Math.Round(soma1 / parMoeda1.BidPrice, decPart);
                         }
                         else
                         {
-                            soma2 = Math.Round(soma1 * parMoeda1.AskPrice, 8);
+                            soma2 = Math.Round(soma1 * parMoeda1.BidPrice, decPart);
                         }
 
                         if (parMoeda1.askQty <= soma2)
                             Valid = false;
 
-                        soma2 -= Math.Round(soma2 * fee ,8);
-                        txt.AppendLine("Exchange: " + parMoeda1.symbol + " - Buy Price: " + parMoeda1.BidPrice + m1 + " - Total Coin: " + soma2 + parMoeda1.symbol.Replace(m1,""));
+                        //soma2 -= Math.Round(soma2 * fee ,8);
+                        txt.AppendLine("Exchange: " + parMoeda1.symbol + " - Buy Price: " + parMoeda1.BidPrice + m1 + " - Total Coin: " + Math.Round(soma2 * fee, 8) + parMoeda1.symbol.Replace(m1,""));
 
                         p1 = "";
                         p2 = "";
@@ -243,16 +254,18 @@ namespace AutoExchange
                         }
 
                         var parMoedaBTC = bnb.First(x => x.symbol.Contains(m1 == p1 ? p2 : p1 + "BTC"));
-                        if (parMoedaBTC.AskPrice == 0)
+                        if (parMoedaBTC.BidPrice == 0)
                             continue;
-                        
-                        var final = Math.Round(soma2 * parMoedaBTC.AskPrice, 8);
+
+                        var final = Math.Round(soma2 * parMoedaBTC.BidPrice, 8);
                         if (parMoedaBTC.askQty <= final)
                             Valid = false;
-                        final -= Math.Round(final * fee,8);
+                        //final -= Math.Round(final * fee,8);
 
-                        txt.AppendLine("Exchange: " + parMoedaBTC.symbol + " - Sell Price: " + parMoedaBTC.BidPrice + p2 + " - Total Coin: " + final + m2);
-                        var Sp = Math.Round((((final * 100) / startCurrence) - 100), 2);
+                        txt.AppendLine("Exchange: " + parMoedaBTC.symbol + " - Sell Price: " + parMoedaBTC.BidPrice + p2 + " - Total Coin: " + Math.Round(final * fee, 8) + m2);
+
+                        var Sp = Math.Round((((final * 100) / startCurrence) - 100), 2);                       
+                       
                         if (final >= startCurrence && Sp >= Convert.ToDecimal(txbConGanAbov.Text.Trim()))
                         {
                             var msg = Sp + "% *** 1º Step: " + par.symbol + " - 2º Step: " + parMoeda1.symbol + " - 3º Step: " + parMoedaBTC.symbol;
@@ -260,36 +273,51 @@ namespace AutoExchange
                             txt.AppendLine("GAIN!!!!!!!!!!! Start: " + startCurrence + " | Stop: "+ final + " | Valid Transaction: " + Valid);
                             txt.AppendLine("==============================================================================");                            
                             txbResult.Text += txt;
-                            txbInBTC.Text = Convert.ToString( final); 
+                            txbInBTC.Text = Convert.ToString( final);
+
+                            soma1 = Math.Round(soma1 * fee, 8);
+                            soma2 = Math.Round(soma2 * fee, 8);
+                            final = Math.Round(final * fee, 8);
+
                             if (Valid && Auto)
                             {
+                                if (soma1.ToString().Contains("."))
+                                    decPart = soma1.ToString().Substring(soma1.ToString().IndexOf(".") + 1).Length;
+                                else
+                                    decPart = 0;
+
                                 var createOrder1 = await client.CreateTestOrder(new CreateOrderRequest()
                                 {                                    
                                     Price = par.AskPrice,
-                                    Quantity = Math.Round(soma1, 8),
+                                    Quantity = Math.Round(soma1, decPart),
                                     Side = OrderSide.Buy,
                                     Symbol = par.symbol,
                                     Type = OrderType.LimitMaker,
                                 });
 
 
-                               var createOrder2= await client.CreateTestOrder(new CreateOrderRequest()
-                               {                                  
-                                   Price = parMoeda1.BidPrice,
-                                   Quantity = Math.Round(soma1, 8),
-                                   Side = OrderSide.Sell,
-                                   Symbol = parMoeda1.symbol,
-                                   Type = OrderType.LimitMaker,
-                               });
+                                var createOrder2= await client.CreateTestOrder(new CreateOrderRequest()
+                                {                                  
+                                    Price = parMoeda1.BidPrice,
+                                    Quantity = Math.Round(soma1, decPart),
+                                    Side = OrderSide.Sell,
+                                    Symbol = parMoeda1.symbol,
+                                    Type = OrderType.LimitMaker,
+                                });
 
-                               var createOrder3 = await client.CreateTestOrder(new CreateOrderRequest()
-                               {                                   
-                                   Price = parMoedaBTC.BidPrice,
-                                   Quantity = Math.Round(soma2, 8),
-                                   Side = OrderSide.Sell,
-                                   Symbol = parMoedaBTC.symbol,
-                                   Type = OrderType.LimitMaker,
-                               });
+                                if (soma2.ToString().Contains("."))
+                                    decPart = soma2.ToString().Substring(soma2.ToString().IndexOf(".") + 1).Length;
+                                else
+                                    decPart = 0;
+
+                                var createOrder3 = await client.CreateTestOrder(new CreateOrderRequest()
+                                {                                   
+                                    Price = parMoedaBTC.BidPrice,
+                                    Quantity = Math.Round(soma2, decPart),
+                                    Side = OrderSide.Sell,
+                                    Symbol = parMoedaBTC.symbol,
+                                    Type = OrderType.LimitMaker,
+                                });
                             }
                         }
 

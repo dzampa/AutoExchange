@@ -120,7 +120,6 @@
             this.txbSecretKey.Name = "txbSecretKey";
             this.txbSecretKey.Size = new System.Drawing.Size(425, 20);
             this.txbSecretKey.TabIndex = 18;
-            this.txbSecretKey.Text = "Secret";
             // 
             // txbAPIKey
             // 
@@ -128,7 +127,6 @@
             this.txbAPIKey.Name = "txbAPIKey";
             this.txbAPIKey.Size = new System.Drawing.Size(425, 20);
             this.txbAPIKey.TabIndex = 17;
-            this.txbAPIKey.Text = "API";
             // 
             // tpUseSetting
             // 
