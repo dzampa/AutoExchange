@@ -17,6 +17,9 @@ namespace BinanceExchange.API.Models.Response
         public string Interval { get; set; }
 
         [DataMember(Order = 3)]
+        public int intervalNum { get; set; }
+
+        [DataMember(Order = 4)]
         public int Limit { get; set; }
     }
 }

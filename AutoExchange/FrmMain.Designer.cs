@@ -47,6 +47,7 @@
             this.txbConGanAbov = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.tbController = new System.Windows.Forms.TabControl();
+            this.chbAutoRun = new System.Windows.Forms.CheckBox();
             this.tbAPIKey.SuspendLayout();
             this.tpUseSetting.SuspendLayout();
             this.tbController.SuspendLayout();
@@ -228,11 +229,22 @@
             this.tbController.Size = new System.Drawing.Size(695, 123);
             this.tbController.TabIndex = 100000;
             // 
+            // chbAutoRun
+            // 
+            this.chbAutoRun.AutoSize = true;
+            this.chbAutoRun.Location = new System.Drawing.Point(692, 11);
+            this.chbAutoRun.Name = "chbAutoRun";
+            this.chbAutoRun.Size = new System.Drawing.Size(96, 17);
+            this.chbAutoRun.TabIndex = 15;
+            this.chbAutoRun.Text = "Automatic Run";
+            this.chbAutoRun.UseVisualStyleBackColor = true;
+            // 
             // AutoExchange
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.chbAutoRun);
             this.Controls.Add(this.tbController);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txbResult);
@@ -269,6 +281,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TabControl tbController;
         private System.Windows.Forms.CheckBox chbAutoNeg;
+        private System.Windows.Forms.CheckBox chbAutoRun;
     }
 }
 

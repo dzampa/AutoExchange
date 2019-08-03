@@ -6,13 +6,14 @@ namespace BinanceExchange.API.Enums
     {
         [EnumMember(Value = "LIMIT")]
         Limit,
-        [EnumMember(Value = "MARKET")]
-        Market,
         [EnumMember(Value = "LIMIT_MAKER")]
         LimitMaker,
+        [EnumMember(Value = "MARKET")]
+        Market,
         [EnumMember(Value = "STOP_LOSS_LIMIT")]
         StopLossLimit,
         [EnumMember(Value = "TAKE_PROFIT_LIMIT")]
         TakeProfitLimit
+            
     }
 }
